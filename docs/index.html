@@ -1,1 +1,157 @@
 
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>麻雀成績管理アプリ</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>麻雀成績管理アプリ</h1>
+        
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="gameInput-tab" data-bs-toggle="tab" data-bs-target="#gameInput" type="button" role="tab" aria-controls="gameInput" aria-selected="true">対局入力</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="statistics-tab" data-bs-toggle="tab" data-bs-target="#statistics" type="button" role="tab" aria-controls="statistics" aria-selected="false">統計</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab" aria-controls="players" aria-selected="false">プレイヤー管理</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">対局履歴</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="myTabContent">
+            <!-- 対局入力タブ -->
+            <div class="tab-pane fade show active" id="gameInput" role="tabpanel" aria-labelledby="gameInput-tab">
+                <h2>新規対局登録</h2>
+                <form id="gameForm">
+                    <div class="mb-3">
+                        <label for="gameDate" class="form-label">対局日</label>
+                        <input type="date" class="form-control" id="gameDate" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="playerCount" class="form-label">プレイヤー数</label>
+                        <select class="form-control" id="playerCount" onchange="updatePlayerFields()">
+                            <option value="4">4人</option>
+                            <option value="3">3人</option>
+                        </select>
+                    </div>
+                    
+                    <div id="playerFields">
+                        <!-- プレイヤーフィールドはJavaScriptで動的に生成 -->
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">対局を記録</button>
+                </form>
+            </div>
+            
+            <!-- 統計タブ -->
+            <div class="tab-pane fade" id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="statsPlayerSelect" class="form-label">プレイヤー選択</label>
+                        <select class="form-control" id="statsPlayerSelect" onchange="showPlayerStats()"></select>
+                    </div>
+                </div>
+                
+                <div id="playerStatsContainer">
+                    <div class="loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container mt-4">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- プレイヤー管理タブ -->
+            <div class="tab-pane fade" id="players" role="tabpanel" aria-labelledby="players-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>プレイヤー追加</h2>
+                        <form id="playerForm">
+                            <div class="mb-3">
+                                <label for="playerName" class="form-label">プレイヤー名</label>
+                                <input type="text" class="form-control" id="playerName" placeholder="新しいプレイヤー名" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">追加</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <h2>登録済みプレイヤー</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>名前</th>
+                                        <th>対局数</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="playersTableBody">
+                                    <tr>
+                                        <td colspan="3" class="text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 対局履歴タブ -->
+            <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                <h2>対局履歴</h2>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>プレイヤー</th>
+                                <th>順位</th>
+                                <th>点数</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gameHistoryTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebaseの読み込み -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.6.10/firebase-firestore-compat.js"></script>
+    
+    <!-- Bootstrap & Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <!-- アプリケーションスクリプト -->
+    <script src="script.js"></script>
+</body>
+</html>
