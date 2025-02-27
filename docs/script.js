@@ -1,12 +1,12 @@
 // Firebaseの設定
 // ※実際に使う前に、ご自身のFirebase設定に置き換えてください
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBZYYPZq6es4iNKFlC0nhhKYzHy8gPAGp8",
+    authDomain: "mahjong-score-tracker-19210.firebaseapp.com",
+    projectId: "mahjong-score-tracker-19210",
+    storageBucket: "mahjong-score-tracker-19210.firebasestorage.app",
+    messagingSenderId: "394062205121",
+    appId: "1:394062205121:web:7e72b8bf2d6983c8bf0440"
 };
 
 // Firebase初期化
